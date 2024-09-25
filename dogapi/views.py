@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.parsers import JSONParser
@@ -29,10 +30,8 @@ class DogDetail(APIView):
             doggie = Dog.objects.get(pk=dog_id)
         except Dog.DoesNotExist:
             return Response({"error": "Dog does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        # Ok, check the request for the data it wants to update.
-        doggie_data = JSONParser().parse(request)
         # Make it good data.
-        doggie_cereal = DogSerializer(doggie, data=doggie_data)
+        doggie_cereal = DogSerializer(data=request.data)
         # Check it's good data.
         if doggie_cereal.is_valid():
             # Save to DB.
@@ -93,7 +92,7 @@ class DogList(APIView):
 
     def post(self, request, format=None):
         doggie_data = JSONParser().parse(request)
-        doggie_cereal = DogSerializer(data=doggie_data)
+        doggie_cereal = DogSerializer(data=doggie_data, many=True)
         if doggie_cereal.is_valid():
             doggie_cereal.save()
             return Response(doggie_cereal.data)
@@ -123,10 +122,8 @@ class BreedDetail(APIView):
             the_breed = Breed.objects.get(pk=breed_id)
         except Breed.DoesNotExist:
             return Response({"error": "Breed does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        # Ok, check the request for the data it wants to update.
-        breed_data = JSONParser().parse(request)
         # Make it good data.
-        breed_serial = BreedSerializer(the_breed, data=breed_data)
+        breed_serial = BreedSerializer(data=request.data)
         # Check it's good data.
         if breed_serial.is_valid():
             # Save to DB.
@@ -139,7 +136,7 @@ class BreedDetail(APIView):
     # DELETE a breed (PUT a dog down)
     def delete(self, request, breed_id, format=None):
         try:
-            the_breed = Dog.objects.get(pk=breed_id)
+            the_breed = Breed.objects.get(pk=breed_id)
         except Breed.DoesNotExist:
             return Response({"error": "Breed does not exist"}, status=status.HTTP_404_NOT_FOUND)
         # Kill the dog(s). :(
@@ -183,9 +180,9 @@ class BreedList(APIView):
 
     def post(self, request, format=None):
         breed_data = JSONParser().parse(request)
-        breed_serial = BreedSerializer(data=breed_data)
+        breed_serial = BreedSerializer(data=breed_data, many=True)
         if breed_serial.is_valid():
             breed_serial.save()
-            return Response(breed_serial.data)
+            return Response(breed_serial.data, status=status.HTTP_201_CREATED)
         else:
             return Response(BreedSerializer.errors, status=status.HTTP_400_BAD_REQUEST)

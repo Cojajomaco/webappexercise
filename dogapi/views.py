@@ -31,7 +31,7 @@ class DogDetail(APIView):
         except Dog.DoesNotExist:
             return Response({"error": "Dog does not exist"}, status=status.HTTP_404_NOT_FOUND)
         # Make it good data.
-        doggie_cereal = DogSerializer(data=request.data)
+        doggie_cereal = DogSerializer(doggie, data=request.data)
         # Check it's good data.
         if doggie_cereal.is_valid():
             # Save to DB.
@@ -123,7 +123,7 @@ class BreedDetail(APIView):
         except Breed.DoesNotExist:
             return Response({"error": "Breed does not exist"}, status=status.HTTP_404_NOT_FOUND)
         # Make it good data.
-        breed_serial = BreedSerializer(data=request.data)
+        breed_serial = BreedSerializer(the_breed, data=request.data)
         # Check it's good data.
         if breed_serial.is_valid():
             # Save to DB.

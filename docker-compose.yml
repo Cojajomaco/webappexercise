@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: ./migrations.sh
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://dogadmin:dogpassword@db:5432/dogdb
+    depends_on:
+      - db
+    networks:
+      - the-pack-network
+    volumes:
+      - .:/dogapp
+
+  db:
+    image: postgres:17.0
+    environment:
+      - POSTGRES_PASSWORD=dogpassword
+      - POSTGRES_USER=dogadmin
+      - POSTGRES_DB=dogdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - the-pack-network
+
+networks:
+  the-pack-network:
+
+volumes:
+  db_data:
+    driver: local

@@ -13,7 +13,7 @@ services:
     networks:
       - the-pack-network
     volumes:
-      - .:/dogapp
+      - .:/usr/src/dogapi
 
   db:
     image: postgres:17.0
